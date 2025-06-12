@@ -30,12 +30,16 @@ dataset.split_dataset()
 """
 X_train_TF, X_test_TF, Y_train_TF, Y_test_TF = dataset.get_encodings(tfidf=True)
 
-best_mlp_tdidf = mlp.find_best_mlp(X_train=X_train_TF,
+mlp_tdidf_params = mlp.find_best_mlp(X_train=X_train_TF,
                                       Y_train=Y_train_TF,
                                       X_test=X_test_TF,
                                       Y_test=Y_test_TF,
                                       n_trials = 3)
 
+
+mlp_tdidf = mlp.Feedforward_Model(X_train_TF, Y_train_TF, units=mlp_tdidf_params['params_units'])
+mlp_tdidf.train(LR=mlp_tdidf_params['params_learning_rate'], epochs=mlp_tdidf_params['params_epochs'])
+mlp_tdidf.plot_loss_accuracy()
 
 
 """

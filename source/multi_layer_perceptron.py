@@ -81,6 +81,6 @@ def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
     learning rate: {best_params['params_learning_rate'].round(4)}
     units: {best_params['params_units']}
 """)
-    return ev_metric
+    return best_params
 
 
