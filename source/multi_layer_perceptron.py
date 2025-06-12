@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import optuna
+from itertools import product
+import pandas as pd
+
 
 class MLP(tf.keras.Model):
     def __init__(self, units):
@@ -41,3 +45,42 @@ class Feedforward_Model:
         ax.plot(self.loss_acc.history['accuracy'])
         ax.grid(True)
         ax.set(xlabel='Epochs', title='Accuracy')
+
+
+def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
+    def train_mlp(trial):
+        epochs = trial.suggest_int("epochs", 100, 200)
+        learning_rate = trial.suggest_float("learning_rate", 0.001, 0.5)
+        units = trial.suggest_int("units", 2, 10)
+
+        fnn = Feedforward_Model(X_train, Y_train, units=units)
+        fnn.train(LR=learning_rate, epochs=epochs)
+
+        result = fnn.model.evaluate(X_test, Y_test, verbose=0)
+        # loss function = result[0]
+        # accuracy = result[1]
+        return result[0], result[1]
+
+    study = optuna.create_study(
+        directions=["minimize", "maximize"],  # loss, accuracy
+        study_name='mlp_optimization'
+    )
+    study.optimize(train_mlp, n_trials=n_trials)
+
+    ev_metric = study.trials_dataframe()
+    ev_metric.rename(columns={'values_0': 'loss', 'values_1': 'accuracy'}, inplace=True)
+    ev_metric.sort_values(by=['accuracy', 'loss'], ascending=False, inplace=True)
+    ev_metric.reset_index(drop=True, inplace=True)
+
+    best_params = ev_metric.iloc[0]
+
+    print(f"""\nBest params:
+    accuracy: {best_params['accuracy'].round(4)}
+    loss function: {best_params['loss'].round(4)}
+    number of epochs: {best_params['params_epochs']}
+    learning rate: {best_params['params_learning_rate'].round(4)}
+    units: {best_params['params_units']}
+""")
+    return ev_metric
+
+

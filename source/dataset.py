@@ -1,14 +1,7 @@
-from itertools import product
-from pandas import DataFrame
 import pandas as pd
-import numpy as np
-import spacy
-import os
-from pathlib import Path
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, OrdinalEncoder
-import tensorflow as tf
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
 
@@ -34,9 +27,11 @@ class Text_Dataset:
         self.label_enc = LabelEncoder().fit(self.labels)
         self.label_enc = LabelEncoder().fit(self.labels)
 
+
     def split_dataset(self, test_size=0.2):
         X_train, X_test, Y_train, Y_test = train_test_split(self.documents, self.labels, test_size=test_size, stratify=self.labels)
         self.split = {'X_train':X_train, 'X_test':X_test, 'Y_train':Y_train, 'Y_test':Y_test}
+
 
     def get_encodings(self, tfidf=False):
         encoder = self.bow # BOW (default)
