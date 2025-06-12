@@ -80,21 +80,10 @@ def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
     ev_metric.sort_values(by=['accuracy', 'loss'], ascending=False, inplace=True)
     ev_metric.reset_index(drop=True, inplace=True)
     ev_metric['time'].mean()
-
-
-
-
     best_params = ev_metric.iloc[0].to_dict()
     best_params['time'] = ev_metric['time'].mean()
-    print(best_params)
 
-#     print(f"""\nBest params:
-#     accuracy: {best_params['accuracy'].round(4)}
-#     loss function: {best_params['loss'].round(4)}
-#     number of epochs: {best_params['params_epochs']}
-#     learning rate: {best_params['params_learning_rate'].round(4)}
-#     units: {best_params['params_units']}
-# """)
+    print(best_params)
     return best_params
 
 
