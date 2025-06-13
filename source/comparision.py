@@ -46,9 +46,17 @@ def test_vocab_size(df, learning_rate: float = 0.1, epochs: int = 100, units: in
     features = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
     result = []
     for f in features:
+        print('.', end='')
         dataset = dat.Text_Dataset(df, col_text="clean_text_str", col_label="sentiment", args={"max_features": f})
         dataset.split_dataset(test_size=0.2) # deafult test size
+        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tfidf=embeding)
+        fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
+        fnn.train(LR=learning_rate, epochs=epochs)
 
+        acc = fnn.model.evaluate(X_test, Y_test, verbose=0)[1]
+        result.append((f, round(acc, 4)))
 
+    print(f"\nThe result is: {result}")
+    return result
 
 
