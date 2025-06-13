@@ -1,5 +1,5 @@
 from os.path import split
-
+import matplotlib.pyplot as plt
 import pandas as pd
 from tabulate import tabulate
 
@@ -30,8 +30,21 @@ class Table():
         else:
             print(self.df.head())
 
-    def print_split_accuracy(self):
-        name_record = []
-        for row in self.df.iterrows():
-            name_record.append((row["name"], row["split_accuracy"]))
-        print(name_record)
+
+
+    def plot_split_accuracy(self):
+        plt.figure(figsize=(20, 5))
+
+        plt.subplot(1, 2, 1)
+        for idx, row in self.df.iterrows():
+            data = row['split_accuracy']
+            splits = [x for x, y in data]
+            accuracies = [y for x, y in data]
+            plt.plot(splits, accuracies, marker='o', label=row['name'])
+
+        plt.title('Split Accuracy')
+        plt.xlabel('Split')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.grid(True)
+
