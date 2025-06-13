@@ -48,3 +48,21 @@ class Table():
         plt.legend()
         plt.grid(True)
 
+
+    def plot_vocab_accuracy(self):
+        plt.figure(figsize=(20, 5))
+
+        plt.subplot(1, 2, 1)
+        for idx, row in self.df.iterrows():
+            data = row['vocab_accuracy']
+            vocab_sizes = [x for x, y in data]
+            accuracies = [y for x, y in data]
+            plt.plot(vocab_sizes, accuracies, marker='o', label=row['name'])
+
+        plt.title('Vocab Size Accuracy')
+        plt.xlabel('Vocab Size')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.grid(True)
+
+
