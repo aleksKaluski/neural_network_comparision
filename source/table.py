@@ -1,4 +1,4 @@
-from os.path import split
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from tabulate import tabulate
@@ -64,5 +64,24 @@ class Table():
         plt.ylabel('Accuracy')
         plt.legend()
         plt.grid(True)
+
+
+    def plot_time_complexity(self):
+        plt.figure(figsize=(20, 5))
+        plt.subplot(1, 2, 1)
+
+
+        for idx, row in self.df.iterrows():
+            time = row['avg_time']
+            epochs = row['epochs']
+            plt.plot(time, epochs, marker='o', label=row['name'])
+
+        plt.title('Time complexity')
+        plt.xlabel('Time')
+        plt.ylabel('Number of epochs')
+        plt.legend()
+        plt.grid(True)
+
+
 
 

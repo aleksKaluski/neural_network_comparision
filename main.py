@@ -28,7 +28,7 @@ dataset.split_dataset()
 
 2.1) TD-IDF encoding 
 """
-X_train_TF, X_test_TF, Y_train_TF, Y_test_TF = dataset.get_encodings(tfidf=True)
+X_train_TF, X_test_TF, Y_train_TF, Y_test_TF = dataset.get_encodings(tdidf=True)
 
 mlp_tdidf_params = mlp.find_best_mlp(X_train=X_train_TF,
                                       Y_train=Y_train_TF,

@@ -3,11 +3,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+import tensorflow as tf
 
 
 class Text_Dataset:
     def __init__(self, df, col_text=None, col_label=None, args={}):
-        self.df = df.copy()
+        self.df = df.copy() # we shall work on pandas df
 
         col_text = col_text or self.df.columns[0]
         col_label = col_label or self.df.columns[1]
@@ -33,10 +34,16 @@ class Text_Dataset:
         self.split = {'X_train':X_train, 'X_test':X_test, 'Y_train':Y_train, 'Y_test':Y_test}
 
 
-    def get_encodings(self, tfidf=False):
+    def get_encodings(self, tdidf=False):
+        """
+        Data for MLP models.
+        :param tdidf: encoding type
+        :return: Train and test sets as BOW or TFIDF vectors.
+        """
         encoder = self.bow # BOW (default)
-        if tfidf: # TF-IDF
+        if tdidf: # TF-IDF
             encoder = self.tfidf
+
         # transform (encode) documents
         X_train = encoder.transform(self.split['X_train']).toarray()
         X_test = encoder.transform(self.split['X_test']).toarray()
@@ -44,6 +51,33 @@ class Text_Dataset:
         Y_test = self.label_enc.transform(self.split['Y_test'])
         return X_train, X_test, Y_train, Y_test
 
+
+    def get_sequences(self, vocab_size=1000, maxlen=100):
+        """
+        Introduce the tokenizer class to easily produce sequences for RRN models.
+        :param vocab_size: the size of the vocabulary.
+        :param maxlen: the maximum length of the sequences.
+        :return: Train and test sets.
+        """
+        self.tokenizer = tf.keras.layers.TextVectorization(
+            max_tokens=vocab_size,
+            output_sequence_length=maxlen
+        )
+
+        # fit tokenizer on the training set
+        self.tokenizer.adapt(self.split['X_train'])
+
+        # vocabulary
+        self.vocabulary = self.tokenizer.get_vocabulary()
+
+        # return indexes
+        X_train = self.tokenizer(self.split['X_train']).numpy()
+        X_test = self.tokenizer(self.split['X_test']).numpy()
+        Y_train = self.label_enc.transform(self.split['Y_train'])
+        Y_test = self.label_enc.transform(self.split['Y_test'])
+
+        return X_train, X_test, Y_train, Y_test
+        
 
     def term_frequency_table(self):
         # take all texts and transform it to array

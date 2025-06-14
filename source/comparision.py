@@ -24,7 +24,7 @@ def test_split_ratio(dataset,
     for s in split:
         print('.', end='')
         dataset.split_dataset(test_size=s)
-        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tfidf=embeding)
+        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tdidf=embeding)
         fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
         fnn.train(LR=learning_rate, epochs=epochs)
 
@@ -49,7 +49,7 @@ def test_vocab_size(df, learning_rate: float = 0.1, epochs: int = 100, units: in
         print('.', end='')
         dataset = dat.Text_Dataset(df, col_text="clean_text_str", col_label="sentiment", args={"max_features": f})
         dataset.split_dataset(test_size=0.2) # deafult test size
-        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tfidf=embeding)
+        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tdidf=embeding)
         fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
         fnn.train(LR=learning_rate, epochs=epochs)
 
