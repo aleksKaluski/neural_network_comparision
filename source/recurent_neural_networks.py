@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from itertools import product
-from pandas import DataFrame
-
+import optuna
 
 class Rec_Unit(tf.keras.Model):
     '''
@@ -65,6 +63,12 @@ class Recurrent_Model:
     def __init__(self, X, Y, input_dim, output_dim, units, rnn_type, two_layers):
         self.X = X
         self.Y = Y
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.units = units
+        self.rnn_type = rnn_type
+        self.two_layers = two_layers
+
         self.model = Rec_Unit(input_dim, output_dim, units, rnn_type, two_layers)
 
     # train the model
@@ -73,6 +77,64 @@ class Recurrent_Model:
                            loss=tf.keras.losses.BinaryCrossentropy(),
                            metrics=['accuracy'])
         self.loss_acc = self.model.fit(self.X, self.Y, epochs=epochs, batch_size=batch_size, verbose=verbose, validation_split=validation_split)
+
+
+
+    def find_best_rnn(self, X_train, Y_train, X_test, Y_test, n_trials=3):
+
+        def train_and_evaluate_rnn(trial):
+
+            epochs = trial.suggest_int("epochs", 100, 200)
+            learning_rate = trial.suggest_float("learning_rate", 0.001, 0.5)
+            units = trial.suggest_int("units", 2, 10)
+
+            rnn = Recurrent_Model(
+                                X=X_train,
+                                Y=Y_train,
+                                input_dim= self.input_dim,
+                                output_dim=self.output_dim,
+                                units=units,
+                                rnn_type=self.rnn_type,
+                                two_layers=self.two_layers,)
+
+            rnn.train(LR=learning_rate,
+                      epochs=epochs,
+                      batch_size=10,
+                      verbose=1,
+                      validation_split=0.2)
+
+            result = rnn.model.evaluate(X_test, Y_test, verbose=0)
+            # loss function = result[0]
+            # accuracy = result[1]
+
+            return result[0], result[1]
+
+        study = optuna.create_study(
+            directions=["minimize", "maximize"],  # loss, accuracy
+            study_name='mlp_optimization'
+        )
+        study.optimize(train_and_evaluate_rnn, n_trials=n_trials)
+        ev_metric = study.trials_dataframe()
+        ev_metric['time'] = ev_metric['duration'].dt.total_seconds()
+        ev_metric.drop(columns=['datetime_start',
+                                'datetime_complete',
+                                'system_attrs_NSGAIISampler:generation',
+                                'state',
+                                'number',
+                                'duration'],
+                       inplace=True)
+
+        ev_metric.rename(columns={'values_0': 'loss', 'values_1': 'accuracy'}, inplace=True)
+        ev_metric.sort_values(by=['accuracy', 'loss'], ascending=False, inplace=True)
+        ev_metric.reset_index(drop=True, inplace=True)
+        ev_metric['time'].mean()
+        best_params = ev_metric.iloc[0].to_dict()
+        best_params['time'] = ev_metric['time'].mean()
+
+        print(best_params)
+        return best_params
+
+
 
     # plot loss and accuracy history
     def plot_loss_accuracy(self):

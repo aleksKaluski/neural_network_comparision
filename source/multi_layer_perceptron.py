@@ -48,6 +48,12 @@ class Feedforward_Model:
 
 
 def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
+    """
+    Find the best MLP model using optuna (external library for tuning parameters - more efficient than grid search).
+    The data must in the form of TD-IDF or BOW.
+    :param n_trials: number of trials for optuna
+    :return: a dictionary with the best MLP model configuration
+    """
     def train_mlp(trial):
         epochs = trial.suggest_int("epochs", 100, 200)
         learning_rate = trial.suggest_float("learning_rate", 0.001, 0.5)
@@ -59,6 +65,7 @@ def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
         result = fnn.model.evaluate(X_test, Y_test, verbose=0)
         # loss function = result[0]
         # accuracy = result[1]
+
         return result[0], result[1]
 
     study = optuna.create_study(
@@ -76,6 +83,7 @@ def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
                             'number',
                             'duration'],
                    inplace=True)
+
     ev_metric.rename(columns={'values_0': 'loss', 'values_1': 'accuracy'}, inplace=True)
     ev_metric.sort_values(by=['accuracy', 'loss'], ascending=False, inplace=True)
     ev_metric.reset_index(drop=True, inplace=True)
