@@ -7,7 +7,13 @@ import source.table as tb
 import source.recurent_neural_networks as rnn
 
 def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float = 0.1, epochs: int = 100, units: int = 5):
-
+    """
+    Train and evaluate a single model. All possible intersections of embedding type and model type included.
+    :param model: MLP, RNN, LSTM or GRU
+    :param dataset: train-test dataset
+    :param embedding: TDIDF, BOW or EBM (embedding)
+    :return: accuracy (float) or a model
+    """
     # standardise
     model = model.upper()
     embedding = embedding.upper()
@@ -71,29 +77,26 @@ def test_split_ratio(dataset,
     print(f"\nThe result is: {result}")
     return result
 
+def test_vocab_size(df,
+                     model: str,
+                     embedding: str,
+                     learning_rate: float = 0.1,
+                     epochs: int = 100,
+                     units: int = 5):
 
-def test_vocab_size(df, learning_rate: float = 0.1, epochs: int = 100, units: int = 5, embeding: bool = False):
-
-    print(f"Intializing test of vocab size with: lr = {learning_rate}, epochs = {epochs}, units = {units}.")
-    if embeding:
-        print("Embeding is TD-IDF.", end='')
-    else:
-        print("Embeding is BOW.", end='')
-
-    features = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
+    print(f"Initializing vocab-size test for {model}, with embedding {embedding}.")
+    print(f"Params: {learning_rate}, {epochs}, {units}")
     result = []
+    features = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
     for f in features:
         print('.', end='')
         dataset = dat.Text_Dataset(df, col_text="clean_text_str", col_label="sentiment", args={"max_features": f})
-        dataset.split_dataset(test_size=0.2) # deafult test size
-        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tdidf=embeding)
-        fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
-        fnn.train(LR=learning_rate, epochs=epochs)
-
-        acc = fnn.model.evaluate(X_test, Y_test, verbose=0)[1]
-        result.append((f, round(acc, 4)))
+        dataset.split_dataset(test_size=0.2) # default test size
+        a = run_end_evaluate(model, dataset, embedding, learning_rate, epochs, units)
+        result.append((f, round(a, 4)))
 
     print(f"\nThe result is: {result}")
     return result
+
 
 
