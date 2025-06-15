@@ -47,7 +47,7 @@ class Feedforward_Model:
         ax.set(xlabel='Epochs', title='Accuracy')
 
 
-def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
+def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials:int = 3, encoding: str = 'BOW'):
     """
     Find the best MLP model using optuna (external library for tuning parameters - more efficient than grid search).
     The data must in the form of TD-IDF or BOW.
@@ -85,13 +85,13 @@ def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials=3):
                    inplace=True)
 
     ev_metric.rename(columns={'values_0': 'loss', 'values_1': 'accuracy'}, inplace=True)
-    ev_metric.sort_values(by=['accuracy', 'loss'], ascending=False, inplace=True)
+
+    # the last value is the best one
+    ev_metric.sort_values(by=['accuracy', 'loss'], ascending=True, inplace=True)
     ev_metric.reset_index(drop=True, inplace=True)
     ev_metric['time'].mean()
-    best_params = ev_metric.iloc[0].to_dict()
-    best_params['time'] = ev_metric['time'].mean()
+    ev_metric['name'] = 'MLP_' + encoding
 
-    print(best_params)
-    return best_params
+    return ev_metric
 
 

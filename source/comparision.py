@@ -68,6 +68,7 @@ def test_split_ratio(dataset,
     result = []
     split = [0.1, 0.2, 0.3, 0.4, 0.5]
 
+    print("Test started", end='')
     for s in split:
         print('.', end='')
         dataset.split_dataset(test_size=s)
@@ -88,6 +89,7 @@ def test_vocab_size(df,
     print(f"Params: {learning_rate}, {epochs}, {units}")
     result = []
     features = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
+    print("Test started", end='')
     for f in features:
         print('.', end='')
         dataset = dat.Text_Dataset(df, col_text="clean_text_str", col_label="sentiment", args={"max_features": f})

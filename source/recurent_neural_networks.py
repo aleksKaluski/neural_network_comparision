@@ -63,11 +63,15 @@ class Recurrent_Model:
     def __init__(self, X, Y, input_dim, output_dim, units, rnn_type, two_layers):
         self.X = X
         self.Y = Y
-        self.input_dim = input_dim
+
+        # output dim must be 1 (binary analysis), so I leave it here
         self.output_dim = output_dim
-        self.units = units
+
+        # input dim = vocab size
+        self.input_dim = input_dim
+
+        # type of the RNN
         self.rnn_type = rnn_type
-        self.two_layers = two_layers
 
         self.model = Rec_Unit(input_dim, output_dim, units, rnn_type, two_layers)
 
@@ -92,6 +96,8 @@ class Recurrent_Model:
             epochs = trial.suggest_int("epochs", 100, 200)
             learning_rate = trial.suggest_float("learning_rate", 0.001, 0.5)
             units = trial.suggest_int("units", 2, 10)
+            two_layers = trial.suggest_bool("two_layers", True, False)
+            batch_size = trial.suggest_int("batch_size", 5, 256)
 
             rnn = Recurrent_Model(
                                 X=X_train,
@@ -100,11 +106,11 @@ class Recurrent_Model:
                                 output_dim=self.output_dim,
                                 units=units,
                                 rnn_type=self.rnn_type,
-                                two_layers=self.two_layers,)
+                                two_layers=two_layers)
 
             rnn.train(LR=learning_rate,
                       epochs=epochs,
-                      batch_size=10,
+                      batch_size=batch_size,
                       verbose=1,
                       validation_split=0.2)
 
@@ -115,12 +121,16 @@ class Recurrent_Model:
             return result[0], result[1]
 
         study = optuna.create_study(
-            directions=["minimize", "maximize"],  # loss, accuracy
+            directions=["minimize", "maximize"],  # minimize loss, maximize accuracy
             study_name='mlp_optimization'
         )
         study.optimize(train_and_evaluate_rnn, n_trials=n_trials)
         ev_metric = study.trials_dataframe()
+
+        # format time
         ev_metric['time'] = ev_metric['duration'].dt.total_seconds()
+
+        # drop unnecessary columns
         ev_metric.drop(columns=['datetime_start',
                                 'datetime_complete',
                                 'system_attrs_NSGAIISampler:generation',
@@ -130,14 +140,16 @@ class Recurrent_Model:
                        inplace=True)
 
         ev_metric.rename(columns={'values_0': 'loss', 'values_1': 'accuracy'}, inplace=True)
-        ev_metric.sort_values(by=['accuracy', 'loss'], ascending=False, inplace=True)
-        ev_metric.reset_index(drop=True, inplace=True)
-        ev_metric['time'].mean()
-        best_params = ev_metric.iloc[0].to_dict()
-        best_params['time'] = ev_metric['time'].mean()
 
-        print(best_params)
-        return best_params
+        # the last value is the best one
+        ev_metric.sort_values(by=['accuracy', 'loss'], ascending=True, inplace=True)
+        ev_metric.reset_index(drop=True, inplace=True)
+
+        # compute avg. time of all runs
+        ev_metric['time'].mean()
+        ev_metric['name'] = 'MLP_' + str(self.rnn_type)
+
+        return ev_metric
 
 
     # plot loss and accuracy history
