@@ -4,32 +4,71 @@ import source.prepare_data as prd
 import source.dataset as dat
 import source.multi_layer_perceptron as mlp
 import source.table as tb
+import source.recurent_neural_networks as rnn
 
+def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float = 0.1, epochs: int = 100, units: int = 5):
 
+    # standardise
+    model = model.upper()
+    embedding = embedding.upper()
+
+    # Multi-layer perception with TD-IDF encodings
+    if model == 'MLP' and embedding == 'TDIDF':
+        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tdidf=True)
+        fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
+        fnn.train(LR=learning_rate, epochs=epochs)
+        return fnn.model.evaluate(X_test, Y_test, verbose=0)[1] # accuracy
+
+    # Multi-layer perception with BOW encodings
+    elif model == 'MLP' and embedding == 'BOW':
+        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tdidf=False)
+        fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
+        fnn.train(LR=learning_rate, epochs=epochs)
+        return fnn.model.evaluate(X_test, Y_test, verbose=0)[1]  # accuracy
+
+    # Recurrent Neural Network with embedding-based encodings
+    elif model == 'RNN' and embedding == 'EBM':
+        X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
+        num_classes = len(set(Y_train))
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=num_classes, units=10, rnn_type="RNN", two_layers=True)
+        return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
+
+    # Long Short-Term Memory with embedding-based encodings
+    elif model == 'LSTM' and embedding == 'EBM':
+        X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
+
+        num_classes = len(set(Y_train))
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=num_classes, units=10, rnn_type="LSTM", two_layers=True)
+        return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
+
+    # Gated recurrent units with embedding-based encodings
+    elif model == 'GRU' and embedding == 'EBM':
+        X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
+
+        num_classes = len(set(Y_train))
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=num_classes, units=10, rnn_type="GRU", two_layers=True)
+        return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
+
+    else:
+        raise ValueError(f'Invalid model-embedding combination. Model "{model}" is not compatible with embedding "{embedding}"')
 
 def test_split_ratio(dataset,
+                     model: str,
+                     embedding: str,
                      learning_rate: float = 0.1,
                      epochs: int = 100,
-                     units: int = 5,
-                     embeding: bool = False):
-    print(f"Intializing test split with: lr = {learning_rate}, epochs = {epochs}, units = {units}.")
-    if embeding:
-        print("Embeding is TD-IDF.", end='')
-    else:
-        print("Embeding is BOW.", end='')
+                     units: int = 5):
 
+    print(f"Initializing split test for {model}, with embedding {embedding}.")
+    print(f"Params: {learning_rate}, {epochs}, {units}")
     result = []
     split = [0.1, 0.2, 0.3, 0.4, 0.5]
 
     for s in split:
         print('.', end='')
         dataset.split_dataset(test_size=s)
-        X_train, X_test, Y_train, Y_test = dataset.get_encodings(tdidf=embeding)
-        fnn = mlp.Feedforward_Model(X_train, Y_train, units=units)
-        fnn.train(LR=learning_rate, epochs=epochs)
-
-        acc = fnn.model.evaluate(X_test, Y_test, verbose=0)[1]
-        result.append((s, round(acc, 4)))
+        a = run_end_evaluate(model, dataset, embedding, learning_rate, epochs, units)
+        result.append((s, round(a, 4)))
 
     print(f"\nThe result is: {result}")
     return result

@@ -35,7 +35,7 @@ class Rec_Unit(tf.keras.Model):
             self.layer2 = RNN_layer(units=units, activation=tf.nn.tanh, name='rnn_layer2')
 
         # output layer
-        self.output_layer = tf.keras.layers.Dense(units=1, activation=tf.nn.sigmoid, name='output_layer')
+        self.output_layer = tf.keras.layers.Dense(units=output_dim, activation=tf.nn.sigmoid, name='output_layer')
 
     def build(self, input_shape):
         '''
@@ -70,6 +70,11 @@ class Recurrent_Model:
         self.two_layers = two_layers
 
         self.model = Rec_Unit(input_dim, output_dim, units, rnn_type, two_layers)
+
+        # model for binary sentiment analysis
+        self.model.compile(optimizer='adam',
+                           loss='binary_crossentropy',
+                           metrics=['accuracy'])
 
     # train the model
     def train(self, LR, epochs, batch_size=32, verbose=0, validation_split=None):
@@ -133,7 +138,6 @@ class Recurrent_Model:
 
         print(best_params)
         return best_params
-
 
 
     # plot loss and accuracy history
