@@ -34,7 +34,7 @@ class Rec_Unit(tf.keras.Model):
         if two_layers:
             self.layer2 = RNN_layer(units=units, activation=tf.nn.tanh, name='rnn_layer2')
 
-        # output layer
+        # sigmoid output layer, since the classification is binary
         self.output_layer = tf.keras.layers.Dense(units=output_dim, activation=tf.nn.sigmoid, name='output_layer')
 
     def build(self, input_shape):

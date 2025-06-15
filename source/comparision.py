@@ -29,24 +29,22 @@ def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float =
     # Recurrent Neural Network with embedding-based encodings
     elif model == 'RNN' and embedding == 'EBM':
         X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
-        num_classes = len(set(Y_train))
-        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=num_classes, units=10, rnn_type="RNN", two_layers=True)
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=10, rnn_type="RNN", two_layers=True)
         return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
 
     # Long Short-Term Memory with embedding-based encodings
     elif model == 'LSTM' and embedding == 'EBM':
         X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
 
-        num_classes = len(set(Y_train))
-        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=num_classes, units=10, rnn_type="LSTM", two_layers=True)
+        # classification is binary, so output_dim=1 (YES/NO classification)
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=10, rnn_type="LSTM", two_layers=True)
         return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
 
     # Gated recurrent units with embedding-based encodings
     elif model == 'GRU' and embedding == 'EBM':
         X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
 
-        num_classes = len(set(Y_train))
-        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=num_classes, units=10, rnn_type="GRU", two_layers=True)
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=10, rnn_type="GRU", two_layers=True)
         return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
 
     else:
