@@ -6,7 +6,7 @@ import source.multi_layer_perceptron as mlp
 import source.table as tb
 import source.recurent_neural_networks as rnn
 
-def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float = 0.1, epochs: int = 100, units: int = 5):
+def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float = 0.1, epochs: int = 100, units: int = 5, batch_size: int = 10, two_layers: bool = True):
     """
     Train and evaluate a single model. All possible intersections of embedding type and model type included.
     :param model: MLP, RNN, LSTM or GRU
@@ -35,7 +35,8 @@ def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float =
     # Recurrent Neural Network with embedding-based encodings
     elif model == 'RNN' and embedding == 'EBM':
         X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
-        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=10, rnn_type="RNN", two_layers=True)
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=units, rnn_type="RNN", two_layers=two_layers)
+        rec.train(LR=learning_rate, epochs=epochs, batch_size=batch_size)
         return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
 
     # Long Short-Term Memory with embedding-based encodings
@@ -43,14 +44,16 @@ def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float =
         X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
 
         # classification is binary, so output_dim=1 (YES/NO classification)
-        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=10, rnn_type="LSTM", two_layers=True)
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=units, rnn_type="LSTM", two_layers=two_layers)
+        rec.train(LR=learning_rate, epochs=epochs, batch_size=batch_size)
         return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
 
     # Gated recurrent units with embedding-based encodings
     elif model == 'GRU' and embedding == 'EBM':
         X_train, X_test, Y_train, Y_test = dataset.get_sequences(vocab_size=1000, maxlen=10)
 
-        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=10, rnn_type="GRU", two_layers=True)
+        rec = rnn.Recurrent_Model(X=X_train, Y=Y_train, input_dim=1004, output_dim=1, units=units, rnn_type="GRU", two_layers=two_layers)
+        rec.train(LR=learning_rate, epochs=epochs, batch_size=batch_size)
         return rec.model.evaluate(X_test, Y_test, verbose=0)[1]
 
     else:
@@ -61,7 +64,9 @@ def test_split_ratio(dataset,
                      embedding: str,
                      learning_rate: float = 0.1,
                      epochs: int = 100,
-                     units: int = 5):
+                     units: int = 5,
+                     batch_size: int = 10,
+                     two_layers: bool = True):
 
     print(f"Initializing split test for {model}, with embedding {embedding}.")
     print(f"Params: {learning_rate}, {epochs}, {units}")
@@ -72,7 +77,7 @@ def test_split_ratio(dataset,
     for s in split:
         print('.', end='')
         dataset.split_dataset(test_size=s)
-        a = run_end_evaluate(model, dataset, embedding, learning_rate, epochs, units)
+        a = run_end_evaluate(model, dataset, embedding, learning_rate, epochs, units, batch_size, two_layers)
         result.append((s, round(a, 4)))
 
     print(f"\nThe result is: {result}")
@@ -83,7 +88,9 @@ def test_vocab_size(df,
                      embedding: str,
                      learning_rate: float = 0.1,
                      epochs: int = 100,
-                     units: int = 5):
+                     units: int = 5,
+                    batch_size: int = 10,
+                    two_layers: bool = True):
 
     print(f"Initializing vocab-size test for {model}, with embedding {embedding}.")
     print(f"Params: {learning_rate}, {epochs}, {units}")
@@ -94,7 +101,7 @@ def test_vocab_size(df,
         print('.', end='')
         dataset = dat.Text_Dataset(df, col_text="clean_text_str", col_label="sentiment", args={"max_features": f})
         dataset.split_dataset(test_size=0.2) # default test size
-        a = run_end_evaluate(model, dataset, embedding, learning_rate, epochs, units)
+        a = run_end_evaluate(model, dataset, embedding, learning_rate, epochs, units, batch_size, two_layers)
         result.append((f, round(a, 4)))
 
     print(f"\nThe result is: {result}")

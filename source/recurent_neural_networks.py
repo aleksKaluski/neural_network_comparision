@@ -173,6 +173,7 @@ def find_best_rnn(X_train, Y_train, X_test, Y_test, n_trials=3, input_dim=1004, 
     ev_metric.reset_index(drop=True, inplace=True)
 
     # compute avg. time of all runs
+    ev_metric['trial_time'] = ev_metric['time']
     ev_metric['time'].mean()
     ev_metric['name'] = str(rnn_type) + '_EBM'
 
