@@ -73,8 +73,10 @@ class Text_Dataset:
         # return indexes
         X_train = self.tokenizer(self.split['X_train']).numpy()
         X_test = self.tokenizer(self.split['X_test']).numpy()
-        Y_train = self.label_enc.transform(self.split['Y_train'])
-        Y_test = self.label_enc.transform(self.split['Y_test'])
+
+        # encode for binary classification
+        Y_train = self.label_enc.transform(self.split['Y_train']).reshape(-1, 1)
+        Y_test = self.label_enc.transform(self.split['Y_test']).reshape(-1, 1)
 
         return X_train, X_test, Y_train, Y_test
         

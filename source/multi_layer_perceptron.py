@@ -90,6 +90,9 @@ def find_best_mlp(X_train, Y_train, X_test, Y_test, n_trials:int = 3, encoding: 
     ev_metric.sort_values(by=['accuracy', 'loss'], ascending=True, inplace=True)
     ev_metric.reset_index(drop=True, inplace=True)
     ev_metric['time'].mean()
+
+    # set units as int
+    ev_metric['params_units'] = ev_metric['params_units'].astype(int)
     ev_metric['name'] = 'MLP_' + encoding
 
     return ev_metric
