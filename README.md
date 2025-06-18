@@ -1,4 +1,4 @@
-# Neural network model comparison 
+# Neural Network Model Comparison 
 
 The aim of this project is to compare various models of neural networks to identify curial distinctions between them. Five combinations of models and encoding were examined.
 
