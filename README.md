@@ -87,13 +87,15 @@ python -m spacy download en_core_web_sm
 3) Gated recurrent units with embedding encoding type
 
 ##### Plot of the impact of test split on the accuracy
-![split_accuracy.png](photos\split_accuracy.png)
+
+![split_test_size](https://github.com/user-attachments/assets/0c49c09c-d936-48f4-a201-f2cd43a893ca)
 
 ##### Plot of the impact of the vocab size on the accuracy
-![split_accuracy.png](photos\split_accuracy.png)
+![split_accuracy](https://github.com/user-attachments/assets/3cf85a11-cadf-42e0-ae11-7b42db74b588)
 
 ##### Plot of the time-complexity
-![time_complexity.png](photos\time_complexity.png)
+
+![time_complexity](https://github.com/user-attachments/assets/b2a9132b-b1a8-48d2-ad88-6dbf645fecab)
 
 ##### Complexity 
 RNN models (classical RNN, LSTM, GRU) have two more trainable parameters more then Multi-layer perceptron. Namely: batch size and an option to have two layers
