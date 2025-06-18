@@ -1,6 +1,7 @@
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from keras.src.metrics import accuracy
 from tabulate import tabulate
 from IPython.display import display
 
@@ -10,12 +11,14 @@ class Table():
     The class designed to keep and plot data about particular models.
     """
     def __init__(self):
-        col_names = ['name', 'epochs', 'lr', 'units', 'avg_time', 'split_accuracy',  'vocab_accuracy', 'two_layers', 'batch_size']
+        col_names = ['name', 'epochs', 'accuracy', 'loss', 'lr', 'units', 'avg_time', 'split_accuracy',  'vocab_accuracy', 'two_layers', 'batch_size']
         self.df = pd.DataFrame(columns=col_names)
 
     def add_record(self,
                    name,
                    epoch=0,
+                   accuracy=0,
+                   loss=0.0,
                    lr=0.0,
                    units=0,
                    avg_time=0.0,
@@ -32,7 +35,7 @@ class Table():
             vocab_accuracy = []
 
 
-        self.df.loc[len(self.df)] = [name, epoch, lr, units, avg_time, split_accuracy, vocab_accuracy, two_layers, batch_size]
+        self.df.loc[len(self.df)] = [name, epoch, accuracy, loss, lr, units, avg_time, split_accuracy, vocab_accuracy, two_layers, batch_size]
 
     def show(self, tabulate_view=True):
         """
@@ -104,6 +107,14 @@ class Table():
         plt.legend()
         plt.grid(True)
 
+    def print_best_accuracy(self):
+        res = self.df.copy()
+        res.sort_values(by=['accuracy', 'loss'], ascending=[False, True], inplace=True)
+
+        print("\nTop 3 best accuracies:")
+        for i in range(3):
+            print(f"{i + 1}) {res.iloc[i]['accuracy']:.4f} for {res.iloc[i]['name']}")
+
 
 class All_trials_table():
     """
@@ -114,9 +125,7 @@ class All_trials_table():
         self.df = pd.DataFrame(columns=col_names)
 
 
-    def add_record(self,
-                   df):
-
+    def add_record(self, df):
         print(f"Adding a new record with params.")
         self.df =pd.concat([self.df, df], ignore_index=True)
 
@@ -135,7 +144,6 @@ class All_trials_table():
         else:
             display(self.df)
 
-    import matplotlib.pyplot as plt
 
     def plot_time_complexity(self):
         plt.figure(figsize=(10, 5))
@@ -145,7 +153,6 @@ class All_trials_table():
         for name in self.df['name'].unique():
             subset = self.df[self.df['name'] == name]
             plt.scatter(subset['trial_time'], subset['params_epochs'], label=name)
-
 
         plt.title('Time Complexity by Model')
         plt.xlabel('Trial Time')

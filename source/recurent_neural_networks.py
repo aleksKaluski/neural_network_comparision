@@ -27,7 +27,9 @@ class Rec_Unit(tf.keras.Model):
         self.embedding_layer = tf.keras.layers.Embedding(input_dim=input_dim, output_dim=output_dim, name='embedding_layer')
 
         # first RNN layer
-        self.layer1 = RNN_layer(units=units, activation=tf.nn.tanh, return_sequences=two_layers, name='rnn_layer1')
+        # optuna does not return boolean params
+        return_bool = bool(two_layers)
+        self.layer1 = RNN_layer(units=units, activation=tf.nn.tanh, return_sequences=return_bool, name='rnn_layer1')
 
         # optional second RNN layer
         self.layer2 = None
@@ -54,7 +56,9 @@ class Rec_Unit(tf.keras.Model):
     def call(self, inputs):
         x = self.embedding_layer(inputs)
         x = self.layer1(x)
-        if self.layer2:
+
+        # fixed LSTM bug
+        if self.layer2 is not None:
             x = self.layer2(x)
         return self.output_layer(x)
 
