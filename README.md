@@ -70,4 +70,30 @@ python -m spacy download en_core_web_sm
    - `Table`: stores the data of best runs as well as comparative studies regarding the vocab size and test-split.
    - `All_trials_table`: stores the data about each individual trial conducted by `optuna`.
 
+## Summary of the results
 
+##### Table with all the results:
+| name      | epochs | accuracy | loss   | lr                 | units | avg_time  | split_accuracy                                                         | vocab_accuracy                                        | two_layers | batch_size |
+|-----------|--------|----------|--------|--------------------|-------|-----------|------------------------------------------------------------------------|-------------------------------------------------------|------------|------------|
+| rnn_emb   | 104    | 0.5720   | 0.7166 | 0.309436188253128  | 6     | 3.87679   | [(0.1, 0.57), (0.2, 0.5575), (0.3, 0.44), (0.4, 0.5725), (0.5, 0.554)] | [(1000, 0.5725), (2000, 0.4275), ..., (8000, 0.475)]  | 1          | 133        |
+| lstm_emb  | 139    | 0.6310   | 3.3159 | 0.0139738427316055 | 7     | 5.757677  | [(0.1, 0.62), (0.2, 0.6425), ..., (0.5, 0.588)]                        | [(1000, 0.5475), (2000, 0.65), ..., (8000, 0.62)]     | 0          | 82         |
+| gru_emb   | 105    | 0.6410   | 0.8266 | 0.227613209031116  | 6     | 12.026911 | [(0.1, 0.57), (0.2, 0.6125), ..., (0.5, 0.615)]                        | [(1000, 0.5725), (2000, 0.5825), ..., (8000, 0.5725)] | 0          | 17         |
+| mlp_tdidf | 120    | 0.7000   | 0.5687 | 0.177334531431444  | 7     | 3.630928  | [(0.1, 0.72), (0.2, 0.68), ..., (0.5, 0.675)]                          | [(1000, 0.72), (2000, 0.7125), ..., (8000, 0.7125)]   | 0          | 0          |
+| mlp_bow   | 122    | 0.6890   | 0.6339 | 0.0730366427984289 | 9     | 2.886153  | [(0.1, 0.69), (0.2, 0.6725), ..., (0.5, 0.695)]                        | [(1000, 0.68), (2000, 0.695), ..., (8000, 0.73)]      | 0          | 0          |
+
+##### Best result was achieved by 
+1) Multi layer perceptron with TD-IDF encoding type
+2) Multi layer perceptron with BOW encoding type
+3) Gated recurrent units with embedding encoding type
+
+##### Plot of the impact of test split on the accuracy
+![split_accuracy.png](photos\split_accuracy.png)
+
+##### Plot of the impact of the vocab size on the accuracy
+![split_accuracy.png](photos\split_accuracy.png)
+
+##### Plot of the time-complexity
+![time_complexity.png](photos\time_complexity.png)
+
+##### Complexity 
+RNN models (classical RNN, LSTM, GRU) have two more trainable parameters more then Multi-layer perceptron. Namely: batch size and an option to have two layers
