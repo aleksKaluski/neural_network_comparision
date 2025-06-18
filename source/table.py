@@ -1,7 +1,5 @@
-
 import matplotlib.pyplot as plt
 import pandas as pd
-from keras.src.metrics import accuracy
 from tabulate import tabulate
 from IPython.display import display
 
@@ -48,8 +46,10 @@ class Table():
         print("\nRecords preview:")
         if tabulate_view:
             print(tabulate(self.df, headers='keys', tablefmt='github', showindex=False))
+            return self.df
         else:
             display(self.df)
+            return self.df
 
     def plot_split_accuracy(self):
         """

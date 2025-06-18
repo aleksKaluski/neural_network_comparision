@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import optuna
-from itertools import product
-import pandas as pd
+
 
 
 class MLP(tf.keras.Model):

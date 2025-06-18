@@ -1,9 +1,5 @@
-from source import multi_layer_perceptron as mlp
-
-import source.prepare_data as prd
 import source.dataset as dat
 import source.multi_layer_perceptron as mlp
-import source.table as tb
 import source.recurent_neural_networks as rnn
 
 def run_end_evaluate(model: str, dataset, embedding: str, learning_rate: float = 0.1, epochs: int = 100, units: int = 5, batch_size: int = 10, two_layers: bool = True):
