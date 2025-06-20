@@ -132,9 +132,10 @@ The best accuracy was achieved Multi-layer Perceptron with TD-IDF encoding type 
 It is clear that word-frequency based methods gave better results on such a small dataset (2000 tweets). The quenstion is: why? On a small datasets, with simple structure, as presented, there is much less information to learn from. RNNs (botch classical as well as LSTM or GRU) have far more complex structure. Contrastingly, a simple structure of MLP takes both less time to learn and can easier adjust to small, undemanding datasets. We should recall two important things:
 1. The models had just 10 runs to tune
 2. The dataset was very small (2000 short tweets)
+   
 For such a small amount of data, encoding techniques are usually much better than the ones with embeddings. Another interesting feature is low time complexity which is almost entirely independent from the number of epochs and type of the model. It might be the special feature of using tweets, since they are too short to provide any meaningful difference in terms of RNN advantages.
 
-What happens when we make the dataset bigger? For instance: if we take a 10000 rows intead of 2000. Still, it is a relatively small amout of data, so the domination of MLP persists. However it is sufficiently large to provide a change in the table. 
+What happens when we make the dataset bigger? For instance: if we take a 10000 rows instead of 2000. Still, it is a relatively small amout of data, so the domination of MLP persists. However it is sufficiently large to provide a change in the table. 
 | Model     | Epochs | Accuracy | Loss  | Learning rate | Units | Average time of training | Has two layers? | Batch Size | Best split-test | Best vocab size |
 |-----------|--------|----------|-------|----------------|--------|---------------------------|------------------|-------------|------------------|------------------|
 | mlp_bow   | 146    | 0.733    | 0.549 | 0.024          | 9      | 16.647                    | NO               | 0           | 0.1              | 5000             |
