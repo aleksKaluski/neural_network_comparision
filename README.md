@@ -30,6 +30,11 @@ Run the following command to install all required packages:
 ```bash
 pip install pandas numpy spacy matplotlib scikit-learn tensorflow optuna tabulate ipython
 ```
+In case of any problems with compatibility environment, install the exact versions of this project provided in the `requirements.txt` file
+
+```bash
+pip install -r requirements.txt
+```
 
 After that, download the small English language model for spaCy:
 
@@ -37,6 +42,18 @@ After that, download the small English language model for spaCy:
 python -m spacy download en_core_web_sm
 ```
 
+## Info regarding the dataset
+Set of English tweets stored with table and annotated with sentiment label. 
+- 0 — negative sentiment
+- 1 — positive sentiment
+
+Structure of the dataset:
+| ID | Tweet                                                                                     |
+|----|-------------------------------------------------------------------------------------------|
+| 1  | @tonigirl14 love you toooooo!! TG LOL Gngb                                                |
+| 0  | @jun6lee I told myself: Don't click on this link. But I just did. Booohooo               |
+
+Full dataset contained 179995 instances, but for this comparison I decided to slice 2000 tweets, since parameter tuning and training time takes a lot of time. 
 ## Pipeline Overview
 
 1. **Downloading the dataset from HuggingFace**  
@@ -99,3 +116,35 @@ python -m spacy download en_core_web_sm
 
 ##### Complexity 
 RNN models (classical RNN, LSTM, GRU) have two more trainable parameters more then Multi-layer perceptron. Namely: batch size and an option to have two layers
+
+## Conclusion 
+The best accuracy was achieved Multi-layer Perceptron with TD-IDF encoding type for 2000 tweets. Bellow is a short comparison of three best models. 
+
+| Model     | Epochs | Accuracy | Loss  | Learning rate | Units | Average time of training | Has two layers? | Batch Size | Best split-test | Best vocab size |
+|-----------|--------|----------|-------|----------------|--------|---------------------------|------------------|-------------|------------------|------------------|
+| mlp_tdidf | 120    | 0.700    | 0.569 | 0.177          | 7      | 3.631                     | NO               | 0           | 0.1              | 5000             |
+| mlp_bow   | 122    | 0.689    | 0.634 | 0.073          | 9      | 2.886                     | NO               | 0           | 0.2              | 1000             |
+| gru_emb   | 105    | 0.641    | 0.827 | 0.228          | 6      | 12.027                    | NO               | 17          | 0.2              | 3000             |
+| lstm_emb  | 139    | 0.631    | 3.316 | 0.014          | 7      | 5.758                     | NO               | 82          | 0.1              | 7000             |
+| rnn_emb   | 104    | 0.572    | 0.717 | 0.309          | 6      | 3.877                     | YES              | 133         | 0.1              | 1000             |
+
+
+It is clear that word-frequency based methods gave better results on such a small dataset (2000 tweets). The quenstion is: why? On a small datasets, with simple structure, as presented, there is much less information to learn from. RNNs (botch classical as well as LSTM or GRU) have far more complex structure. Contrastingly, a simple structure of MLP takes both less time to learn and can easier adjust to small, undemanding datasets. We should recall two important things:
+1. The models had just 10 runs to tune
+2. The dataset was very small (2000 short tweets)
+For such a small amount of data, encoding techniques are usually much better than the ones with embeddings. Another interesting feature is low time complexity which is almost entirely independent from the number of epochs and type of the model. It might be the special feature of using tweets, since they are too short to provide any meaningful difference in terms of RNN advantages.
+
+What happens when we make the dataset bigger? For instance: if we take a 10000 rows intead of 2000. Still, it is a relatively small amout of data, so the domination of MLP persists. However it is sufficiently large to provide a change in the table. 
+| Model     | Epochs | Accuracy | Loss  | Learning rate | Units | Average time of training | Has two layers? | Batch Size | Best split-test | Best vocab size |
+|-----------|--------|----------|-------|----------------|--------|---------------------------|------------------|-------------|------------------|------------------|
+| mlp_bow   | 146    | 0.733    | 0.549 | 0.024          | 9      | 16.647                    | NO               | 0           | 0.1              | 5000             |
+| mlp_tdidf | 200    | 0.730    | 0.533 | 0.045          | 7      | 29.877                    | NO               | 0           | 0.2              | 4000             |
+| lstm_emb  | 193    | 0.673    | 0.662 | 0.175          | 2      | 15.924                    | YES              | 231         | 0.4              | 5000             |
+| gru_emb   | 200    | 0.671    | 0.843 | 0.043          | 4      | 18.012                    | YES              | 235         | 0.1              | 2000             |
+| rnn_emb   | 100    | 0.597    | 0.709 | 0.059          | 5      | 6.636                     | NO               | 116         | 0.4              | 7000             |
+
+Now the LSTM model is the third one. What is even more interesting is a significant difference in the training time. 
+
+
+
+![time_10000.png](photos\time_10000.png)
