@@ -41,6 +41,7 @@ After that, download the small English language model for spaCy:
 ```bash
 python -m spacy download en_core_web_sm
 ```
+The project was prepared in PyCharm IDE with Python 3.10.0.
 
 ## Info regarding the dataset
 Set of English tweets stored with table and annotated with sentiment label. 
