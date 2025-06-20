@@ -143,8 +143,7 @@ What happens when we make the dataset bigger? For instance: if we take a 10000 r
 | gru_emb   | 200    | 0.671    | 0.843 | 0.043          | 4      | 18.012                    | YES              | 235         | 0.1              | 2000             |
 | rnn_emb   | 100    | 0.597    | 0.709 | 0.059          | 5      | 6.636                     | NO               | 116         | 0.4              | 7000             |
 
-Now the LSTM model is the third one. What is even more interesting is a significant difference in the training time. 
+he third one. What is even more interesting is a significant difference in the training time. 
+Now the LSTM model is t![time_10000](https://github.com/user-attachments/assets/13ff157c-68b5-409e-bdc1-e1bcfe5f428c)
 
 
-
-![time_10000.png](photos\time_10000.png)
